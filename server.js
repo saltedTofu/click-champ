@@ -19,6 +19,8 @@ if(process.env.NODE_ENV === 'production'){
 }
 app.use(express.static('./frontend/build'));
 
+app.get('/db', db.db);
+
 app.get('/users', db.getUsers);
 
 app.get('/',(req,res) => {
