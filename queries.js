@@ -11,7 +11,7 @@ const devConfig = {
 
 const proConfig = {
   connectionString: process.env.DATABASE_URL, //comes from heroku addon
-  ssl:true
+  ssl: { rejectUnauthorized: false }
 }
 
 const pool = new Pool(process.env.NODE_ENV === "production" ? proConfig : devConfig); //uses proper config if in production or development
