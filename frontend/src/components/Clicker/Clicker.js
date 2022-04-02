@@ -1,7 +1,9 @@
 import { Typography, InputLabel, Button, Input, Paper } from '@mui/material';
 import './Clicker.css';
+import {useState} from 'react';
 
-function Clicker({currentUser,clicks,setClicks, deposit, setDeposit}){
+function Clicker({currentUser, deposit, setDeposit}){
+    const [clicks, setClicks] = useState(0);
 
     const depositClick = () =>{ 
         if(currentUser){

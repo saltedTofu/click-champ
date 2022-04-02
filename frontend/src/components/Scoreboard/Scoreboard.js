@@ -4,7 +4,7 @@ import { Typography, InputLabel, Button, Input, Paper, Table, TableBody, TableCe
 import './Scoreboard.css';
 import Row from './Row/Row';
 
-function Scoreboard({currentUser, clicks, deposit, setDeposit}){
+function Scoreboard({deposit}){
     const [topUsers,setTopUsers] = useState([]);
     useEffect(()=>{
         console.log('scoreboard render');

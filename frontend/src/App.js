@@ -12,22 +12,17 @@ import { Typography} from '@mui/material';
 function App() {
 
   const [currentUser,setCurrentUser] = useState('');
-  const [clicks, setClicks] = useState(0);
+  
   const [deposit, setDeposit] = useState(true);
 
   return (
     <div className="App">
       <Typography variant="h1">😤 Click Champ 😤</Typography>
       <Scoreboard 
-        currentUser={currentUser}
-        clicks={clicks}
         deposit={deposit}
-        setDeposit={setDeposit}
       />
       <Clicker 
         currentUser={currentUser}
-        clicks={clicks}
-        setClicks = {setClicks}
         deposit={deposit}
         setDeposit={setDeposit}
       />
