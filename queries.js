@@ -18,7 +18,7 @@ const pool = new Pool(process.env.NODE_ENV === "production" ? proConfig : devCon
 
 //GET all users
 const getUsers = (request, response) => {
-  pool.query('SELECT * FROM userList', (error, results) => {
+  pool.query('SELECT * FROM userList ORDER BY score DESC', (error, results) => {
     if (error) {
       throw error
     }
@@ -118,9 +118,10 @@ const deleteUser = (request, response) => {
 const incrementClick = (request,response) => {
   const body = JSON.parse(Object.keys(request.body)[0]);
   const username = body.currentUser;
+  const clicksToAdd = body.clicks;
   pool.query(
-    'UPDATE userlist SET score = score+1 WHERE name=$1', 
-    [username],
+    'UPDATE userlist SET score = score+$1 WHERE name=$2', 
+    [clicksToAdd,username],
     (error,results) => {
       if(error){
         throw error
