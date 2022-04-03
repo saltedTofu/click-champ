@@ -37,16 +37,19 @@ const login = (request, response) => {
     if (error) {
       throw error
     }
+    if(!results.rows[0]){
+      return response.status(404).json('user does not exist');
+    }
     let salt = results.rows[0].salt;
     let hash = CryptoJS.SHA256(password+salt);
     password = hash.toString(CryptoJS.enc.Base64);
+    console.log(password + ' andddd' + results.rows[0].password);
     if(password !== results.rows[0].password){
       response.status(200).json('invalid login credentials');
     }
     else{
       response.status(200).json(results.rows);
     }
-    
   })
 }
 
@@ -74,11 +77,11 @@ const createUser = (request, response) => {
         if (error) {
           throw error
         }
-        response.status(201).send(`User added`);
+        response.status(201).json(`User added`);
       })
     }
     else{
-      response.status(404).send('Username taken');
+      response.status(404).json('Username taken');
     }
   })
   
