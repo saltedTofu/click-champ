@@ -4,8 +4,6 @@ import './Login.css';
 function Login({currentUser, setCurrentUser}){
 
     function login(username,password){
-        console.log('logging in');
-        console.log(username,password);
         const data = {
             username,
             password
@@ -23,7 +21,6 @@ function Login({currentUser, setCurrentUser}){
         })
         .then((data)=>{
             const user = data[0];
-            console.log(data);
             if(!user){
                 document.getElementById('loginOutput').innerHTML = `Username or Password Incorrect`;
                 return;

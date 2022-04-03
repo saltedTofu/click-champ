@@ -18,7 +18,7 @@ function Row({user, topUsers}){
         else if(user.user === topUsers[2].user){
             setRankEmoji(emojis[2]);
         }
-    })
+    },[])
     return(
         <div className="scoreboardPlayer">
             <Typography variant="h4" className="scoreboardUser">{user.user + rankEmoji}</Typography>

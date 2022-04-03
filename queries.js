@@ -1,4 +1,5 @@
 require("dotenv").config();
+const CryptoJS = require("crypto-js");
 const Pool = require('pg').Pool
 
 const devConfig = {
@@ -26,17 +27,26 @@ const getUsers = (request, response) => {
   })
 }
 
-//GET user by id
 const login = (request, response) => {
   const body = JSON.parse(Object.keys(request.body)[0]);
   const username=body.username;
-  const password = body.password;
-  pool.query('SELECT * FROM userList WHERE name = $1 AND password = $2', [username,password], (error, results) => {
+  let password = body.password;
+
+  //retrieve salt
+  pool.query('SELECT * FROM userList WHERE name = $1', [username], (error, results) => {
     if (error) {
       throw error
     }
-    console.log(results.rows);
-    response.status(200).json(results.rows)
+    let salt = results.rows[0].salt;
+    let hash = CryptoJS.SHA256(password+salt);
+    password = hash.toString(CryptoJS.enc.Base64);
+    if(password !== results.rows[0].password){
+      response.status(200).json('invalid login credentials');
+    }
+    else{
+      response.status(200).json(results.rows);
+    }
+    
   })
 }
 
@@ -45,74 +55,33 @@ const createUser = (request, response) => {
   const body = JSON.parse(Object.keys(request.body)[0]);
   const id=body.id;
   const name=body.name;
-  const password = body.password;
+  let password = body.password;
+  //create salt
+  var salt = CryptoJS.lib.WordArray.random(128 / 8);
+  salt=salt.toString(CryptoJS.enc.Base64);
+
+  //hash password + salt
+  let hash = CryptoJS.SHA256(password+salt);
+  password = hash.toString(CryptoJS.enc.Base64);
+
   pool.query(`SELECT * FROM userList WHERE name = $1`, [name], (error,results) => { //Check if username is taken
     if (error){
       throw error
     }
     else if(results.rows[0] === undefined){
       console.log('new user')
-      pool.query(`INSERT INTO userList (name,password) VALUES ($1, $2)`,[name,password], (error, results) => {
+      pool.query(`INSERT INTO userList (name,password,salt) VALUES ($1, $2, $3)`,[name,password,salt], (error, results) => {
         if (error) {
           throw error
         }
-        response.status(201).send(`User added with ID: `);
+        response.status(201).send(`User added`);
       })
     }
     else{
-      console.log('username taken');
       response.status(404).send('Username taken');
     }
   })
   
-}
-
-//POST update user
-const updateUser = (request, response) => {
-  const body = JSON.parse(Object.keys(request.body)[0]);
-  console.log(body);
-  const username = body.username;
-  const oldPassword = body.oldPassword;
-  const newPassword = body.newPassword;
-  pool.query(
-    'SELECT * FROM userList WHERE name = $1', [username], (error, results) => {
-      if (error) {
-        throw error
-      }
-      else if(!results.rows[0]){
-        console.log('no user info found')
-        response.status(404).send('Incorrect login information');
-      }
-      else if(results.rows[0].password == oldPassword){
-        console.log('password match');
-        pool.query(
-          'UPDATE userlist SET password = $1 WHERE name=$2', 
-          [newPassword,username],
-          (error,results) => {
-            if(error){
-              throw error
-            }
-            response.status(201).send('password changed successfully');
-          }
-        )
-      }
-      else{
-        response.status(404).send('Incorrect login information');
-      }
-    }
-  )
-}
-
-//DELETE user
-const deleteUser = (request, response) => {
-  const id = parseInt(request.params.id)
-
-  pool.query('DELETE FROM userList WHERE id = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).send(`User deleted with ID: ${id}`)
-  })
 }
 
 const incrementClick = (request,response) => {
@@ -147,8 +116,6 @@ module.exports = {
     getUsers,
     login,
     createUser,
-    updateUser,
-    deleteUser,
     incrementClick,
     db
   }

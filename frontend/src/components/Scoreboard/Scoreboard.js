@@ -6,8 +6,9 @@ import Row from './Row/Row';
 
 function Scoreboard({deposit}){
     const [topUsers,setTopUsers] = useState([]);
+
+
     useEffect(()=>{
-        console.log('scoreboard render');
         const options = {
             method:"GET"
         }

@@ -29,7 +29,6 @@ app.get('/',(req,res) => {
 
 app.post('/adduser', db.createUser);
 app.put('/incrementClick',db.incrementClick);
-app.put('/updateuser', db.updateUser);
 app.put('/login', db.login);
 
 app.get('*',(req,res)=>{
